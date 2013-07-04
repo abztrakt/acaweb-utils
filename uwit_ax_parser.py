@@ -1,4 +1,4 @@
-""" ax_parser.py - a utility script for parsing XML exports of Dynamics AX timesheets.
+""" uwit_ax_parser.py - a utility script for parsing XML exports of Dynamics AX timesheets used by UW-IT.
 """
 from xml.dom import minidom
 
