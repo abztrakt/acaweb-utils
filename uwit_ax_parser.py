@@ -8,15 +8,35 @@ TIMESHEET = "/Users/cstimmel/Downloads/TSTimesheetSignOff.Report.xml"
 WEEK_HOURS = 40  # The number of hours that should be used to calculate each project as a percentage of the week's work.
 
 
-def main(timesheet):
+class TimesheetDatum():
+    project = None
+    activity = None
+    totalhrs = None
+    percentage = None
+
+
+def parse(timesheet):
     xmldoc = minidom.parse(timesheet)
     details = xmldoc.getElementsByTagName('Detail')
+    data = []
     for detail in details:
-        project = detail.getAttribute('Textbox_59')
-        activity = detail.getAttribute('ActivityTxt')
-        totalhrs = float(detail.getAttribute('TotalHours1'))
-        percentage = totalhrs/WEEK_HOURS * 100
-        print "%s (%s): %s%% (%s hrs)" % (project, activity, percentage, totalhrs)
+        obj = TimesheetDatum()
+        obj.project = detail.getAttribute('Textbox_59')
+        obj.activity = detail.getAttribute('ActivityTxt')
+        obj.totalhrs = float(detail.getAttribute('TotalHours1'))
+        obj.percentage = obj.totalhrs/WEEK_HOURS * 100
+        data.append(obj)
+    return data
+
+
+def printdata(data):
+    for datum in data:
+        print "%s (%s): %s%% (%s hrs)" % (datum.project, datum.activity, datum.percentage, datum.totalhrs)
+
+
+def main(timesheet):
+    data = parse(timesheet)
+    printdata(data)
 
 
 if __name__ == "__main__":
