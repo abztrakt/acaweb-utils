@@ -13,9 +13,10 @@ def main(timesheet):
     details = xmldoc.getElementsByTagName('Detail')
     for detail in details:
         project = detail.getAttribute('Textbox_59')
+        activity = detail.getAttribute('ActivityTxt')
         totalhrs = float(detail.getAttribute('TotalHours1'))
         percentage = totalhrs/WEEK_HOURS * 100
-        print "%s: %s%% (%s)" % (project, percentage, totalhrs)
+        print "%s (%s): %s%% (%s hrs)" % (project, activity, percentage, totalhrs)
 
 
 if __name__ == "__main__":
