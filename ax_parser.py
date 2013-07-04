@@ -9,7 +9,12 @@ TIMESHEET = "/Users/cstimmel/Downloads/TSTimesheetSignOff.Report.xml"
 
 def main(timesheet):
     xmldoc = minidom.parse(timesheet)
-    print xmldoc.toxml()
+    details = xmldoc.getElementsByTagName('Detail')
+    for detail in details:
+        project = detail.getAttribute('Textbox_59')
+        totalhrs = detail.getAttribute('TotalHours1')
+        print project
+        print totalhrs
 
 
 if __name__ == "__main__":
