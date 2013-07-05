@@ -12,29 +12,36 @@ WEEK_HOURS = 40  # The number of hours that should be used to calculate each pro
 class TimesheetDatum():
     project = None
     activity = None
-    totalhrs = None
-    percentage = None
+    totalhrs = 0
 
+    def __repr__(self):
+        return "%s (%s)" % (self.project, self.activity)
+
+    def percentage(self):
+        weekhours = WEEK_HOURS * args.timesheets.__len__()
+        return self.totalhrs/weekhours * 100
 
 def tsparse(timesheets):
-    data = []
+    data = {}
     for timesheet in timesheets:
         xmldoc = minidom.parse(timesheet)
         details = xmldoc.getElementsByTagName('Detail')
         for detail in details:
-            obj = TimesheetDatum()
-            obj.project = detail.getAttribute('Textbox_59')
-            obj.activity = detail.getAttribute('ActivityTxt')
-            obj.totalhrs = float(detail.getAttribute('TotalHours1'))
-            obj.percentage = obj.totalhrs/WEEK_HOURS * 100
-            data.append(obj)
+            repr = "%s (%s)" % (detail.getAttribute('Textbox_59'), detail.getAttribute('ActivityTxt'))
+            try:
+                data[repr].totalhrs = data[repr].totalhrs + float(detail.getAttribute('TotalHours1'))
+            except KeyError:
+                obj = TimesheetDatum()
+                obj.project = detail.getAttribute('Textbox_59')
+                obj.activity = detail.getAttribute('ActivityTxt')
+                obj.totalhrs = float(detail.getAttribute('TotalHours1'))
+            data[obj.__repr__()] = obj
     return data
 
 
 def printdata(data):
-    for datum in data:
-        print "%s (%s): %s%% (%s hrs)" % (datum.project, datum.activity, datum.percentage, datum.totalhrs)
-
+    for datum in data.values():
+        print "%s: %s%% (%s hrs)" % (datum.__repr__(), datum.percentage(), datum.totalhrs)
 
 def main(args):
     data = tsparse(args.timesheets)
