@@ -3,13 +3,19 @@ import gzip
 import urllib
 import pdb
 import argparse
+import csv
 
 DEBUG = True;
 
 def main(args):
     if args.filename:
-    
+        
+
         f = gzip.open(args.filename)
+        split1 = args.filename.split('logs/access_log.');
+        split2 = split1[1].split('.gz')
+        fname = "%s%s%s%s/%s%s/%s%s" % (split2[0][0],split2[0][1],split2[0][2],split2[0][3],split2[0][4],split2[0][5],split2[0][6],split2[0][7])
+        #print fname
         regex = re.compile('\/search\/\?')
         count = 0
         pCount = 0
@@ -67,6 +73,15 @@ def main(args):
             del dictionary['distance']
         if 'limit' in dictionary:
             del dictionary['limit']
+        if 'q' in dictionary:
+            del dictionary['q']
+        if 'cx' in dictionary:
+            del dictionary['cx']
+        if 'cof' in dictionary:
+            del dictionary['cof']
+        if 'sa' in dictionary:
+            del dictionary['sa']
+
         
         if DEBUG == True:
             print dictionary
@@ -79,6 +94,19 @@ def main(args):
             for filters in dictionary[keys]:
                 print "    " + filters + ": " + str(dictionary[keys][filters])
             print
+
+        print "debug......"
+        pdb.set_trace()
+
+        with open('result.csv', 'a') as csvfile:
+            excelwriter = csv.writer(csvfile, delimiter='\n', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            excelwriter.writerow(['----------'])
+            excelwriter.writerow([fname])
+            for keys in dictionary:
+                excelwriter.writerow([keys])
+                for filters in dictionary[keys]:
+                    excelwriter.writerow([filters, dictionary[keys][filters]])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
