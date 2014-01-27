@@ -3,10 +3,11 @@ import gzip
 import urllib
 import pdb
 import csv
+import operator
 
 DEBUG = False;
 
-QUARTER = 'SPRING'
+QUARTER = 'AUTUMN'
 AUTUMN_START = '20120924'
 AUTUMN_END = '20130106'
 WINTER_START = '20130107'
@@ -31,24 +32,22 @@ def main():
         end = SUMMER_END
     year = start[:4]      
   #  year = start / 10000
-    print "year is: " + year
+#    print "year is: " + year
     month = start[4:6]
   #  month = ( (start / 100) % 100 )
-    print "month is: " + month
+#    print "month is: " + month
     date = start[-2:]
   #  date = start % 100
-    print "date is: " + date
+#    print "date is: " + date
     data = LogReport()
   
     DATE = year + month + date
 
-    print "Date: " + DATE
+#    print "Date: " + DATE
    
-    print "start date: " + start
-    print "end date: " + end
-
-    while (DATE != end):
-
+#    print "start date: " + start
+#    print "end date: " + end
+    while ( DATE != end):
         filename = 'logs/access_log.' + DATE + '.gz'
         print "Filename: " + filename
         
@@ -57,8 +56,8 @@ def main():
         split1 = filename.split('logs/access_log.');
         split2 = split1[1].split('.gz')
         fname = "%s%s%s%s/%s%s/%s%s" % (split2[0][0],split2[0][1],split2[0][2],split2[0][3],split2[0][4],split2[0][5],split2[0][6],split2[0][7])
-        print fname
-        regex = re.compile('\/search\/\?')
+#        print fname
+        regex = re.compile('\/api\/v1\/spot\/\?')
         count = 0
         pCount = 0
         dictionary = {}
@@ -75,25 +74,37 @@ def main():
                     print "Original log entry with decoded url: %s" % line
                 
                 phrases = line.split('&')   #split the line by different filters
-               # print line.find('&')
                 firstLine = phrases[0].split('?')   #strip the stuff before question mark that's attached to the filter
                 phrases[0] = firstLine[1]
-            
+           
                 length = len(phrases)
                 lastLine = phrases[length - 1].split('HTTP')  #strip the unnecessary stuff attached to the last filter
                 phrases[length - 1] = lastLine[0]
                 
+                for index in range(len(phrases)):
+                    if index < len(phrases):
+                        if phrases[index].find('=') == -1:
+                            phrases[index - 1] += '&' + phrases[index]
+                            phrases.remove(phrases[index])
+
                 pCount = 0
                 for phrase in phrases:
                     pCount = pCount + 1
+                    
+                    if phrase.endswith(' '):
+                        phrase = phrase[:-1]
+                    
                     if DEBUG == True:
                         print "Filter #%d: %s" % (pCount, phrase)
+                            
                     if not phrase.startswith('T'):
                         request = phrase.split('=')
                     
                     key = request[0]        #outer dict keys(filters) are text to the left of equal sign 
                     innerKey = request[1]   #inner dict keys(corresponding options) are text to the right of equal sign
-
+                    temp = innerKey.split('+')
+                    innerKey = ' '.join(temp)
+                    
                     if key.startswith('extended_info'):
                         key = key[14:]      #strip 'extended_info' from key
                     
@@ -126,14 +137,14 @@ def main():
         if 'sa' in dictionary:
             del dictionary['sa']
 
-        print dictionary
-        print "Total search found: %d" % count + '\n'
+    #    print dictionary
+    #    print "Total search found: %d" % count + '\n'
         
-        print "Search Summary:" + '\n'
+    #    print "Search Summary:" + '\n'
         for keys in dictionary:
-            print keys + ": " 
+    #        print keys + ": " 
             for filters in dictionary[keys]:
-                print "    " + filters + ": " + str(dictionary[keys][filters])
+    #            print "    " + filters + ": " + str(dictionary[keys][filters])
                 if keys == 'capacity':
                     data.update_capacity(filters, dictionary[keys][filters])
                     #print data.capacity
@@ -161,7 +172,7 @@ def main():
                 if keys.startswith('has_'):
                     data.update_info(keys, dictionary[keys][filters])
             
-            print '\n'
+    #        print '\n'
         
         if (month == '01' or month == '03' or month == '05' or month == '07' or month == '08' or month == '10' or month == '12'):
             if (date == '31' and month == '12'):
@@ -189,49 +200,114 @@ def main():
                     month = '0' + str(month)
                 date = '01'
 
-        print "month - " + month
+   #     print "month - " + month
         
-        print "date - " + date
+   #     print "date - " + date
 
         DATE = year + month + date
-        print "the next date is: " + DATE
+   #     print "the next date is: " + DATE
 
-
-    print "Capacity: " + str(data.capacity)
-    print "Noise Level: " + str(data.noise_level)
-    print "Space Type: " + str(data.space_type)
-    print "Building Name: " + str(data.building_name)
-    print "Reservable: " + str(data.reservable)
-    print "Food Nearby: " + str(data.food_nearby)
-    print "Open Now: " + str(data.open_now)
-    print "Open At: " + str(data.open_at)
-    print "Open Until: " + str(data.open_until)
-    print "Extended Info: " + str(data.info)
-
-
-    with open('spring_quarter.csv', 'wb') as csvfile:
-        excelwriter = csv.writer(csvfile, delimiter='\n', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-        for key in data.capacity:
-            excelwriter.writerow([key, data.capacity[key]])
-        for key in data.noise_level:
-            excelwriter.writerow([key, data.noise_level[key]])
-        for key in data.space_type:
-            excelwriter.writerow([key, data.space_type[key]])
-        for key in data.building_name:
-            excelwriter.writerow([key, data.building_name[key]])
-        for key in data.food_nearby:
-            excelwriter.writerow([key, data.food_nearby[key]])  
-        for key in data.open_at:
-            excelwriter.writerow([key, data.open_at[key]])
-        for key in data.open_until:
-            excelwriter.writerow([key, data.open_until[key]])
-        for key in data.info:
-            excelwriter.writerow([key, data.info[key]])
     
 
-        excelwriter.writerow([data.reservable])
-        excelwriter.writerow([data.open_now])
+#    print "Capacity: " + str(data.capacity)
+#    print "Noise Level: " + str(data.noise_level)
+#    print "Space Type: " + str(data.space_type)
+#    print "Building Name: " + str(data.building_name)
+#    print "Reservable: " + str(data.reservable)
+#    print "Food Nearby: " + str(data.food_nearby)
+#    print "Open Now: " + str(data.open_now)
+#    print "Open At: " + str(data.open_at)
+#    print "Open Until: " + str(data.open_until)
+#    print "Extended Info: " + str(data.info)
+
+    print "Search Summary:" + '\n'
+    
+    print "Capacity: "
+    sorted_capacity = sorted(data.capacity.iteritems(), key=operator.itemgetter(1))
+    sorted_capacity.reverse()
+    for (key, value) in sorted_capacity:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Noise Level: "
+    sorted_noiselvl = sorted(data.noise_level.iteritems(), key=operator.itemgetter(1))
+    sorted_noiselvl.reverse()
+    for (key, value) in sorted_noiselvl:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Space Type: "
+    sorted_type = sorted(data.space_type.iteritems(), key=operator.itemgetter(1))
+    sorted_type.reverse()
+    for (key, value) in sorted_type:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Extended Info: "
+    sorted_info = sorted(data.info.iteritems(), key=operator.itemgetter(1))
+    sorted_info.reverse()
+    for (key, value) in sorted_info:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Building Name: "
+    sorted_building = sorted(data.building_name.iteritems(), key=operator.itemgetter(1))
+    sorted_building.reverse()
+    for (key, value) in sorted_building:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Reservable: "
+    print "    " + "True" + ": " + str(data.reservable)
+    print '\n'
+
+    print "Food Nearby: "
+    sorted_food = sorted(data.food_nearby.iteritems(), key=operator.itemgetter(1))
+    sorted_food.reverse()
+    for (key, value) in sorted_food:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Open Now: "
+    print "    " + "True" + ": " + str(data.open_now)
+    print '\n'
+
+    print "Open At: "
+    sorted_openAt = sorted(data.open_at.iteritems(), key=operator.itemgetter(1))
+    sorted_openAt.reverse()
+    for (key, value) in sorted_openAt:
+        print "    " + key + ": " + str(value)
+    print '\n'
+
+    print "Open Until: " 
+    sorted_openTil = sorted(data.open_until.iteritems(), key=operator.itemgetter(1))
+    sorted_openTil.reverse()
+    for (key, value) in sorted_openTil:
+        print "    " + key + ": " + str(value)
+
+#    with open('spring_quarter.csv', 'wb') as csvfile:
+#        excelwriter = csv.writer(csvfile, delimiter='\n', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+#
+#        for key in data.capacity:
+#            excelwriter.writerow([key, data.capacity[key]])
+#        for key in data.noise_level:
+#            excelwriter.writerow([key, data.noise_level[key]])
+#        for key in data.space_type:
+#            excelwriter.writerow([key, data.space_type[key]])
+#        for key in data.building_name:
+#            excelwriter.writerow([key, data.building_name[key]])
+#        for key in data.food_nearby:
+#            excelwriter.writerow([key, data.food_nearby[key]])  
+#        for key in data.open_at:
+#            excelwriter.writerow([key, data.open_at[key]])
+#        for key in data.open_until:
+#            excelwriter.writerow([key, data.open_until[key]])
+#        for key in data.info:
+#            excelwriter.writerow([key, data.info[key]])
+#    
+#
+#        excelwriter.writerow([data.reservable])
+#        excelwriter.writerow([data.open_now])
 
 
 class LogReport:
@@ -241,14 +317,6 @@ class LogReport:
     space_type = {}
     building_name = {}
     info = {}
-    has_computers = True
-    has_displays = True
-    has_natural_light = True
-    has_outlets = True
-    has_printing = True
-    has_projector = True
-    has_scanner = True
-    has_whiteboards = True
     open_at = {}
     open_now = 0
     open_until = {}
