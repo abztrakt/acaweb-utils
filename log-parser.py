@@ -8,8 +8,8 @@ import operator
 DEBUG = False;
 
 QUARTER = 'AUTUMN'
-AUTUMN_START = '20120924'
-AUTUMN_END = '20130106'
+AUTUMN_START = '20130925'
+AUTUMN_END = '20131214'
 WINTER_START = '20130107'
 WINTER_END = '20130331'
 SPRING_START = '20130401'
@@ -47,9 +47,9 @@ def main():
    
 #    print "start date: " + start
 #    print "end date: " + end
-    while ( DATE != end):
+    while ( DATE != end ):
         filename = 'logs/access_log.' + DATE + '.gz'
-        print "Filename: " + filename
+    #    print "Filename: " + filename
         
         
         f = gzip.open(filename)
@@ -179,26 +179,27 @@ def main():
                 month = '01'
                 date = '01'
                 year = str(int(year) + 1)
-            if (date == '31' and month < '12'):
+            elif (date == '31' and month < '12'):
                 month = str(int(month) + 1)
                 if int(month) < 10:
                     month = '0' + str(month)
                 date = '01'
-            if date < '31':
+            else:  #date < '31'
                 date = str(int(date) + 1)
                 if int(date) < 10:
                     date = '0' + str(date)
                         
         else:
-            if date < '30':
-                date = str(int(date) + 1)
-                if int(date) < 10:
-                    date = '0' + str(date)
             if ((date == '30' and month < '12') or (date == '28' and month == '02')):
                 month = str(int(month) + 1)
                 if int(month) < 10:
                     month = '0' + str(month)
                 date = '01'
+            else:  #date < '30'
+                date = str(int(date) + 1)
+                if int(date) < 10:
+                    date = '0' + str(date)
+
 
    #     print "month - " + month
         
