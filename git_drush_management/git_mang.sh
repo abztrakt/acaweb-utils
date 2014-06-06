@@ -14,9 +14,10 @@ drush sql-dump --result-file=../$NOW.sql
 
 echo -n "Enter the location for which directory you want to move the SQL file into (e.g. testing/) "
 read sql_location
-#this needs to be set to the $NOW that was set when timestamped 
+
+#this goes above drupal site 
 cd ..
-mv *.sql $sql_location
+mv $NOW.sql $sql_location
 #cd back into ~ then back into $drupal_location instead of command below
 cd drupal/
 
@@ -32,7 +33,11 @@ read tag
 
 git fetch --tags
 
-#git checkout -b $branch origin/$tag
-git checkout -b $branch origin/master
+echo `pwd`
+git branch -a
+git tag
+git remote -v
+
+git checkout -b $branch $tag
 
 drush vset --exact site_offline 0
