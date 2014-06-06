@@ -1,0 +1,13 @@
+Instructions to install Drush and Pear:
+1) Install Drush (https://github.com/drush-ops/drush) at the users root directory.
+    a) Under step 3 (changing $PATH), step ii may be the best option.
+2) Step 5 (composer install) is not necessary.
+3) Install a local PEAR copy on shared host (http://pear.php.net/manual/en/installation.shared.php)
+    a) If you are unable to "pear install -o PEAR" it may be because you don't have the go-pear.phar file. This file downlads the necessary PHP files to install and run PEAR.
+    b) Use the command "wget  http://pear.php.net/go-pear.phar" to download the go-pear.phar file (http://pear.php.net/manual/en/installation.getting.php).
+4) If you are getting warnings about "include_path defined in the currently used php.ini" take a look at this stackoverflow page (http://stackoverflow.com/questions/628838/how-to-set-up-pear-on-mac-os-x-10-5-leopard) to make sense of the warning and what should do.
+5) You're all done! You can type "drush" and "pear" and if you see a list of options that means they are installed! :)
+
+Issuses one may encounter:
+    a) Issue - Console_Table erros from Drush
+    a) Solution - You can try the command "pear install Console_Table-1.2.0" **see webpage for version** However, that command may not work. Alternatively, you can download Table.inc @ http://pear.php.net/package/Console_Table, unzip it, cp the file to drush/includes/

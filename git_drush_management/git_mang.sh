@@ -17,12 +17,12 @@ read sql_location
 
 #this goes above drupal site 
 cd ..
-mv $NOW.sql $sql_location
-#cd back into ~ then back into $drupal_location instead of command below
-cd drupal/
 
 #check if sql file is in there
 #then move file to $sql_location
+mv $NOW.sql $sql_location
+
+#do i need to cd back into ~ then back into $drupal_location instead of command below
 
 drush vset --exact site_offline 1
 
@@ -32,11 +32,6 @@ echo -n "Enter a name for the tag you want to create (e.g. v3.6) "
 read tag
 
 git fetch --tags
-
-echo `pwd`
-git branch -a
-git tag
-git remote -v
 
 git checkout -b $branch $tag
 
