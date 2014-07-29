@@ -2,7 +2,10 @@
 
 NOW=$(date +"%m-%d-%y-%H-%M-%S")
 
-source variable_list.sh
+echo -n "Choose your sites variable list (e.g. escience_variables.sh) "
+read VARIABLES
+
+source $VARIABLES
 cd ~
 #echo "We are in your home directory now"
 cd $DRUPAL_LOCATION
@@ -22,15 +25,19 @@ mv $NOW.sql $SQL_LOCATION
 cd ~
 cd $DRUPAL_LOCATION
 
-drush vset --exact site_offline 1
-
-echo -n "Enter a name for the branch you want to create (e.g. eScience3.6) "
+echo -n "Enter a name for the branch you want to create (e.g. v3.6) "
 read BRANCH_NAME
-echo -n "Enter a name for the tag you want to create (e.g. v3.6) "
+echo -n "Enter a name for the tag you want to create (e.g. sitename-3.6) "
 read TAG_NAME
 
 git fetch --tags
 
+drush vset --exact site_offline 1
+
 git checkout -b $BRANCH_NAME  $TAG_NAME
 
+drush -v updatedb
+
 drush vset --exact site_offline 0
+
+drush cache-clear all
