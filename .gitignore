@@ -33,3 +33,6 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Drush site_vars to ignore
+git_drush_managment/*vars
