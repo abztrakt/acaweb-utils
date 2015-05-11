@@ -20,6 +20,13 @@
      #real-url {
        font-weight:700;
      }
+
+     .json-area {
+       width:1000px; 
+       background-color:#FFFFCC; 
+       color:#000;
+       font-size:15px;
+     }
     </style>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   </head>
@@ -79,6 +86,7 @@ if (is_null($username)) {
         $wp_http = new WP_Http;
 
         $result = $wp_http->request ($request_url, $args);
+        echo "<hr>";
         echo "You requested: <b>$request_url</b> <br>";
         echo "Go to <a href='http://json.parser.online.fr' target='_blank'> JSON Parser Online</a> to simply format the JSON";
         put_json($result['body']);
@@ -95,10 +103,10 @@ function get_form() {
     <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
     <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
     <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
-    <input type="radio" name="type" value="custom" id="custom-radio-btn">custom<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
-    <input type="text" placeholder="custom type" name="custom_type" style="display:none" id="custom-type" size="40">
-    <hr>
-    <input type="checkbox" name="meta" id="meta-checkbox">meta
+    <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
+    <input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40">
+    <br>
+    <input type="checkbox" name="meta" id="meta-checkbox"><i>meta</i>
     <p id="url-to-request">You are about to request <input type="text" name="url_request" value="" size="100" id="real-url"></p>
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
@@ -132,6 +140,10 @@ function get_form() {
            id = $('#custom-id').val();
            checkMetaCheckbox();
        });
+       $('#custom-type').change(function() {
+           type = "post?type[]=" + $('#custom-type').val();
+           checkMetaCheckbox();
+       });
    });
 
    function checkTypeRadioStatus() {
@@ -150,7 +162,7 @@ function get_form() {
            $('#page-id').css('display', 'none');
        }
        if ($('#custom-radio-btn').is(':checked')) {
-           type = "";
+           type = "?type[]=";
            $('#custom-id').css('display', 'inline');
            $('#custom-type').css('display', 'inline');
            checkMetaCheckbox();
@@ -174,7 +186,7 @@ function get_form() {
 
 function put_json($str) {
 ?>
-  <div class="json-area" style="width:960px; background-color:grey; color:#FFF">
+  <div class="json-area" style="">
     <pre style="word-wrap: break-word; white-space: pre-wrap;">
       <?php echo $str ?>
     </pre>
