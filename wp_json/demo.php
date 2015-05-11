@@ -138,6 +138,7 @@ function get_form() {
        });
        $('#custom-id').change(function() {
            id = $('#custom-id').val();
+           type = type + "/";
            checkMetaCheckbox();
        });
        $('#custom-type').change(function() {
@@ -148,14 +149,14 @@ function get_form() {
 
    function checkTypeRadioStatus() {
        if ($('#post-radio-btn').is(':checked')) {
-           type = "posts";
+           type = "posts/";
            $('#post-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
            $('#post-id').css('display', 'none');
        }
        if ($('#page-radio-btn').is(':checked')) {
-           type = "pages";
+           type = "pages/";
            $('#page-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
@@ -175,9 +176,9 @@ function get_form() {
    // changes the url, according to whether of not the meta checkbox is checked
    function checkMetaCheckbox() {
        if ($('#meta-checkbox').is(':checked')) {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id + '/meta');
+           $('#url-to-request input').val($('#url-base').val() + "/" + type + id + '/meta');
        } else {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id);
+           $('#url-to-request input').val($('#url-base').val() + "/" + type + id);
        }
    }
   </script>
