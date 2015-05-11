@@ -141,21 +141,21 @@ function get_form() {
            checkMetaCheckbox();
        });
        $('#custom-type').change(function() {
-           type = "post?type[]=" + $('#custom-type').val();
+           type = "posts?type[]=" + $('#custom-type').val();
            checkMetaCheckbox();
        });
    });
 
    function checkTypeRadioStatus() {
        if ($('#post-radio-btn').is(':checked')) {
-           type = "post";
+           type = "posts";
            $('#post-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
            $('#post-id').css('display', 'none');
        }
        if ($('#page-radio-btn').is(':checked')) {
-           type = "page";
+           type = "pages";
            $('#page-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
