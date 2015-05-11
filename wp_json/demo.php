@@ -25,7 +25,7 @@
        width:1000px; 
        background-color:#FFFFCC; 
        color:#000;
-       font-size:15px;
+       font-size:13px;
      }
     </style>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -187,9 +187,9 @@ function get_form() {
 function put_json($str) {
 ?>
   <div class="json-area" style="">
-    <pre style="word-wrap: break-word; white-space: pre-wrap;">
+    <xmp style="word-wrap: break-word; white-space: pre-wrap;">
       <?php echo $str ?>
-    </pre>
+    </xmp>
   </div>
 <?php
 }
