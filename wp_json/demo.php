@@ -3,6 +3,11 @@
   <head>
     <meta charset='utf-8'>
     <title>Testing</title>
+    <style>
+     input[type="text"] {
+       margin:5px;
+     }
+    </style>
   </head>
   <body>
   </body>
@@ -24,9 +29,8 @@ if (isset($_SERVER['PHP_AUTH_USER'])) {
     $username = $_SERVER['PHP_AUTH_USER'];
     $password = $_SERVER['PHP_AUTH_PW'];
 
-// most other servers
 } elseif (isset($_SERVER['HTTP_AUTHORIZATION'])) {
- 
+    // most other servers
     if (strpos(strtolower($_SERVER['HTTP_AUTHORIZATION']),'basic')===0)
         list($username,$password) = explode(':',base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
  
@@ -73,7 +77,13 @@ if (is_null($username)) {
 function get_form() {
 ?>
   <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-    <input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100">
+    <input type="text" placeholder="Your base url. E.g. http://wonka.cac.washington.edu/itconnect/wp-json" name="url_base" id="url-base" size="80"><br>
+    <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
+    <input type="radio" name="type" value="post" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
+    <input type="radio" name="type" value="page">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
+    <input type="radio" name="type" value="custom">custom<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
+    <input type=text" placeholder="custom type" name="custom_type" style="display:none" id="custom-type" size="40">
+    <p id="url-to-request">You are about to request <b></b></p>
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
 <?php
