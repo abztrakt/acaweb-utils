@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Testing</title>
+  </head>
+  <body>
+  </body>
+</html>
 <?php 
 /*
   This is an example of how to get json data from the json api
@@ -32,7 +41,7 @@ if (is_null($username)) {
     die();
  
 } else {
-    echo "<p>Hello {$username}.</p>";
+    echo "<p>How do you do, {$username}.</p>";
     echo "<p>You entered SOME_PASSWORD as your password.</p>";
     echo "<p>Welcome to WP API demo. Remember to put <b>'http://' or 'https://'</b> in front of your URL.</p>";
     
@@ -56,6 +65,7 @@ if (is_null($username)) {
         echo "Go to <a href='http://json.parser.online.fr' target='_blank'> JSON Parser Online</a> to simply format the JSON";
         put_json($result['body']);
 
+        // unset because we are done
         unset($_POST['submit_input']);
     }
 }
@@ -63,7 +73,7 @@ if (is_null($username)) {
 function get_form() {
 ?>
   <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-    <input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size=100">
+    <input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100">
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
 <?php
@@ -71,8 +81,8 @@ function get_form() {
 
 function put_json($str) {
 ?>
-  <div class="json-area" style="width:800px">
-    <pre>
+  <div class="json-area" style="width:960px; background-color:grey; color:#FFF">
+    <pre style="word-wrap: break-word; white-space: pre-wrap;">
       <?php echo $str ?>
     </pre>
   </div>
@@ -80,12 +90,3 @@ function put_json($str) {
 }
 
 ?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <title>Testing</title>
-  </head>
-  <body>
-  </body>
-</html>
