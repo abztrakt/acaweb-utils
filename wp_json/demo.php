@@ -27,6 +27,12 @@
        color:#000;
        font-size:13px;
      }
+
+     .radio-area {
+       width:450px;
+       margin:15px;
+       background-color:#EEEEFE
+     }
     </style>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   </head>
@@ -75,8 +81,7 @@ if (is_null($username)) {
     // Using apache authorization information
     $args = array(
         'headers' => array(
-            'Authorization' => 'Basic ' . base64_encode($_SERVER['PHP_AUTH_USER'] 
-                                                        . ':' . $_SERVER['PHP_AUTH_PW']), 
+            'Authorization' => 'Basic ' . base64_encode($username . ':' . $password)
         ),
     );
 
@@ -98,33 +103,48 @@ if (is_null($username)) {
 
 function get_form() {
 ?>
-  <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+  <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
     <input type="text" placeholder="Your base url. E.g. http://wonka.cac.washington.edu/itconnect/wp-json" name="url_base" id="url-base" size="80"><br>
+    
     <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
-    <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
-    <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
-    <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
+    <div class="radio-area">
+      <input type="radio" name="request_method" value="POST" id="post-method-radio-btn" checked>POST (to create something)<input type="text" placeholder="data here" name="post_method_data" style="display:none" id="post-method-data" size="20"><br>
+      <input type="radio" name="request_method" value="GET" id="get-method-radio-btn">GET  (to retrieve something)<br>
+      <input type="radio" name="request_method" value="PUT" id="put-method-radio-btn">PUT  (to edit something)<br>
+      <input type="radio" name="request_method" value="PUT" id="delete-method-radio-btn">DELETE (to delete something)<br>
+    </div>
+    <div class="radio-area">
+      <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
+      <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
+      <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
+    </div>
     <input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40">
     <br>
     <input type="checkbox" name="meta" id="meta-checkbox"><i>meta</i>
-    <p id="url-to-request">You are about to request <input type="text" name="url_request" value="" size="100" id="real-url"></p>
+    <p id="url-to-request">You are about to <u id="request-method-prompt"></u><input type="hidden" name="method" id="request-method-hidden"></u> <input type="text" name="url_request" value="" size="100" id="real-url"></p>
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
   <script>
    var id = "";
    var type = "";
+   var data = "";
 
    $(document).ready(function(){
        checkTypeRadioStatus();
        checkMetaCheckbox();
+       getRequestMethod();
 
+       $('input[name="request_method"]').click(function() {
+           getRequestMethod();
+       });
        $('input[name="type"]').click(function() {
            checkTypeRadioStatus();
        });
        $('#meta-checkbox').click(function() {
            checkMetaCheckbox();
        });
-
+       
+       // text fields
        $('#url-base').change(function() {
            checkMetaCheckbox();
        });
@@ -138,7 +158,6 @@ function get_form() {
        });
        $('#custom-id').change(function() {
            id = $('#custom-id').val();
-           type = type + "/";
            checkMetaCheckbox();
        });
        $('#custom-type').change(function() {
@@ -149,14 +168,14 @@ function get_form() {
 
    function checkTypeRadioStatus() {
        if ($('#post-radio-btn').is(':checked')) {
-           type = "posts/";
+           type = "posts";
            $('#post-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
            $('#post-id').css('display', 'none');
        }
        if ($('#page-radio-btn').is(':checked')) {
-           type = "pages/";
+           type = "pages";
            $('#page-id').css('display', 'inline');
            checkMetaCheckbox();
        } else {
@@ -176,9 +195,33 @@ function get_form() {
    // changes the url, according to whether of not the meta checkbox is checked
    function checkMetaCheckbox() {
        if ($('#meta-checkbox').is(':checked')) {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + id + '/meta');
+           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id + '/meta');
        } else {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + id);
+           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id);
+       }
+   }
+
+   function getRequestMethod() {
+       if ($('#post-method-radio-btn').is(':checked')) {
+           $('#input-form').attr('method', 'post');
+           $('#request-method-prompt').html('POST');
+           $('#request-method-hiddem').val('post');
+           $('#post-method-data').css('display', 'inline');
+       } else if ($('#get-method-radio-btn').is(':checked')) {
+           $('#input-form').attr('method', 'get');
+           $('#request-method-prompt').html('GET');
+           $('#request-method-hiddem').val('get');
+           $('#post-method-data').css('display', 'none');
+       } else if ($('#put-method-radio-btn').is(':checked')) {
+           $('#input-form').attr('method', 'put');
+           $('#request-method-prompt').html('PUT')
+           $('#request-method-hiddem').val('put');
+           $('#post-method-data').css('display', 'none');
+       } else {
+           $('#input-form').attr('method', 'delete');
+           $('#request-method-prompt').html('DELETE');
+           $('#request-method-hiddem').val('delete');
+           $('#post-method-data').css('display', 'none');
        }
    }
   </script>
