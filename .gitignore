@@ -4,11 +4,13 @@
 *.so
 
 # Packages
+.Python
 *.egg
 *.egg-info
 dist
 build
 eggs
+include
 parts
 bin
 var
@@ -33,6 +35,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# editor swap files
+*.swp
 
 # Drush site_vars to ignore
 git_drush_managment/*vars
