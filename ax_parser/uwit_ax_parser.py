@@ -48,11 +48,13 @@ def printdata(projects, graph):
     print
     labels = []
     sizes = []
+    explode = []
     timeSheetHours = 0
     for project in projects:
         timeSheetHours = timeSheetHours + projects[project].totalhours
         labels.append(project)
         sizes.append(projects[project].totalhours)
+        explode.append(0.025)
         print "%s (%s)" % (project, str(projects[project].totalhours))
         for activity in projects[project].activities:
             print "   - %s (%s)" % (activity, str(projects[project].activities[activity].totalhours))
@@ -61,7 +63,8 @@ def printdata(projects, graph):
     print
     print "************************************************************************"
     if graph:
-        plt.pie(sizes, labels=labels, autopct='%1.1f%%', shadow=True)
+        colors = ('b', 'g', 'r', 'c', 'm', 'y')
+        plt.pie(sizes, explode=explode, labeldistance=1.2, pctdistance=1.1, labels=labels, colors=colors, autopct='%1.1f%%')
         plt.axis('equal')
         plt.show()
 
