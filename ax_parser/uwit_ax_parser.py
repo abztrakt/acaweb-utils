@@ -2,6 +2,7 @@
 """
 from xml.dom import minidom
 import argparse
+import matplotlib.pyplot as plt
 
 class Activity():
 
@@ -41,13 +42,17 @@ def tsparse(timesheets):
 
     return projects
 
-def printdata(projects):
+def printdata(projects, graph):
     print "************************************************************************"
     print
     print
+    labels = []
+    sizes = []
     timeSheetHours = 0
     for project in projects:
         timeSheetHours = timeSheetHours + projects[project].totalhours
+        labels.append(project)
+        sizes.append(projects[project].totalhours)
         print "%s (%s)" % (project, str(projects[project].totalhours))
         for activity in projects[project].activities:
             print "   - %s (%s)" % (activity, str(projects[project].activities[activity].totalhours))
@@ -55,14 +60,20 @@ def printdata(projects):
     print "Total number of hours on these timesheets: " + str(timeSheetHours)
     print
     print "************************************************************************"
+    if graph:
+        plt.pie(sizes, labels=labels, autopct='%1.1f%%', shadow=True)
+        plt.axis('equal')
+        plt.show()
 
 def main(args):
     data = tsparse(args.timesheets)
-    printdata(data)
+    graph = args.graph
+    printdata(data, graph)
 
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument(nargs='+', action='store', dest='timesheets')
+    argparser.add_argument("-g", "--graph", action='store_true', default=False, dest='graph')
+    argparser.add_argument(nargs="+", action='store', dest='timesheets')
     args = argparser.parse_args()
     main(args)
