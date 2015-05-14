@@ -115,9 +115,9 @@ function get_form() {
     <div class="radio-area">
       <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
       <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
-      <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
+      <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40"><br>
+      <input type="radio" name="type" value="user" id="user-radio-btn">user<input type="text" placeholder="user id" name="user_id" style="display:none" id="user-id" size="20"><br>
     </div>
-    <input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40">
     <br>
     <input type="checkbox" name="meta" id="meta-checkbox"><i>meta</i>
     <p id="url-to-request">You are about to <u id="request-method-prompt"></u><input type="hidden" name="method" id="request-method-hidden"></u> <input type="text" name="url_request" value="" size="100" id="real-url"></p>
@@ -163,6 +163,10 @@ function get_form() {
            type = "posts?type[]=" + $('#custom-type').val();
            checkMetaCheckbox();
        });
+       $('#user-id').change(function() {
+           id = $('#user-id').val();
+           checkMetaCheckbox();
+       });
    });
 
    function checkTypeRadioStatus() {
@@ -188,6 +192,13 @@ function get_form() {
        } else {
            $('#custom-id').css('display', 'none');
            $('#custom-type').css('display', 'none');
+       }
+       if ($('#user-radio-btn').is(':checked')) {
+           type = "users";
+           $('#user-id').css('display', 'inline');
+           checkMetaCheckbox();
+       } else {
+           $('#user-id').css('display', 'none');
        }
    }
 
