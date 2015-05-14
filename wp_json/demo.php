@@ -98,6 +98,8 @@ if (is_null($username)) {
 
         // unset because we are done
         unset($_POST['submit_input']);
+    } else {
+        echo "SDFIOSDFSDFSD";
     }
 }
 
@@ -108,10 +110,7 @@ function get_form() {
     
     <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
     <div class="radio-area">
-      <input type="radio" name="request_method" value="POST" id="post-method-radio-btn" checked>POST (to create something)<input type="text" placeholder="data here" name="post_method_data" style="display:none" id="post-method-data" size="20"><br>
-      <input type="radio" name="request_method" value="GET" id="get-method-radio-btn">GET  (to retrieve something)<br>
-      <input type="radio" name="request_method" value="PUT" id="put-method-radio-btn">PUT  (to edit something)<br>
-      <input type="radio" name="request_method" value="PUT" id="delete-method-radio-btn">DELETE (to delete something)<br>
+      <input type="radio" name="request_method" value="GET" id="get-method-radio-btn" checked>GET  (to retrieve something)<br>
     </div>
     <div class="radio-area">
       <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
@@ -202,16 +201,16 @@ function get_form() {
    }
 
    function getRequestMethod() {
-       if ($('#post-method-radio-btn').is(':checked')) {
+       $('#request-method-prompt').html('GET');
+       $('#request-method-hiddem').val('get');
+       $('#post-method-data').css('display', 'none');
+       /* if ($('#post-method-radio-btn').is(':checked')) {
            $('#input-form').attr('method', 'post');
            $('#request-method-prompt').html('POST');
            $('#request-method-hiddem').val('post');
            $('#post-method-data').css('display', 'inline');
        } else if ($('#get-method-radio-btn').is(':checked')) {
-           $('#input-form').attr('method', 'get');
-           $('#request-method-prompt').html('GET');
-           $('#request-method-hiddem').val('get');
-           $('#post-method-data').css('display', 'none');
+  
        } else if ($('#put-method-radio-btn').is(':checked')) {
            $('#input-form').attr('method', 'put');
            $('#request-method-prompt').html('PUT')
@@ -222,7 +221,7 @@ function get_form() {
            $('#request-method-prompt').html('DELETE');
            $('#request-method-hiddem').val('delete');
            $('#post-method-data').css('display', 'none');
-       }
+       }*/
    }
   </script>
 <?php
