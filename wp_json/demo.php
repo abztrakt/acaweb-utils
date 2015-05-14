@@ -22,10 +22,15 @@
      }
 
      .json-area {
-       width:1000px; 
        background-color:#FFFFCC; 
        color:#000;
        font-size:13px;
+     }
+
+     .radio-area {
+       width:450px;
+       margin:15px;
+       background-color:#EEEEFE
      }
     </style>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
@@ -71,12 +76,12 @@ if (is_null($username)) {
     echo "<p>Welcome to WP API demo. Remember to put <b>'http://' or 'https://'</b> in front of your URL.</p>";
     
     get_form(); // show the form
+    description();
 
     // Using apache authorization information
     $args = array(
         'headers' => array(
-            'Authorization' => 'Basic ' . base64_encode($_SERVER['PHP_AUTH_USER'] 
-                                                        . ':' . $_SERVER['PHP_AUTH_PW']), 
+            'Authorization' => 'Basic ' . base64_encode($username . ':' . $password)
         ),
     );
 
@@ -89,99 +94,109 @@ if (is_null($username)) {
         echo "<hr>";
         echo "You requested: <b>$request_url</b> <br>";
         echo "Go to <a href='http://json.parser.online.fr' target='_blank'> JSON Parser Online</a> to simply format the JSON";
-        put_json($result['body']);
+        put_json(format_json($result['body']));
 
         // unset because we are done
         unset($_POST['submit_input']);
     }
 }
 
+function format_json($json, $html = false, $tabspaces = null)
+{
+    $tabcount = 0;
+    $result = '';
+    $inquote = false;
+    $ignorenext = false;
+
+    if ($html) {
+        $tab = str_repeat("&nbsp;", ($tabspaces == null ? 4 : $tabspaces));
+        $newline = "<br/>";
+    } else {
+        $tab = ($tabspaces == null ? "\t" : str_repeat(" ", $tabspaces));
+        $newline = "\n";
+    }
+
+    for($i = 0; $i < strlen($json); $i++) {
+        $char = $json[$i];
+
+        if ($ignorenext) {
+            $result .= $char;
+            $ignorenext = false;
+        } else {
+            switch($char) {
+                case ':':
+                    $result .= $char . (!$inquote ? " " : "");
+                    break;
+                case '{':
+                    if (!$inquote) {
+                        $tabcount++;
+                        $result .= $char . $newline . str_repeat($tab, $tabcount);
+                    }
+                    else {
+                        $result .= $char;
+                    }
+                    break;
+                case '}':
+                    if (!$inquote) {
+                        $tabcount--;
+                        $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char;
+                    }
+                    else {
+                        $result .= $char;
+                    }
+                    break;
+                case ',':
+                    if (!$inquote) {
+                        $result .= $char . $newline . str_repeat($tab, $tabcount);
+                    }
+                    else {
+                        $result .= $char;
+                    }
+                    break;
+                case '"':
+                    $inquote = !$inquote;
+                    $result .= $char;
+                    break;
+                case '\\':
+                    if ($inquote) $ignorenext = true;
+                    $result .= $char;
+                    break;
+                default:
+                    $result .= $char;
+            }
+        }
+    }
+
+    return $result;
+}
+
 function get_form() {
 ?>
-  <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-    <input type="text" placeholder="Your base url. E.g. http://wonka.cac.washington.edu/itconnect/wp-json" name="url_base" id="url-base" size="80"><br>
-    <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
-    <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
-    <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
-    <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><br>
-    <input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40">
-    <br>
-    <input type="checkbox" name="meta" id="meta-checkbox"><i>meta</i>
-    <p id="url-to-request">You are about to request <input type="text" name="url_request" value="" size="100" id="real-url"></p>
+  <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
+    <p id="url-to-request">You are about to <u>GET</u><input type="hidden" name="method" id="request-method-hidden"></u> <input type="text" name="url_request" value="" size="100" id="real-url"></p>
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
-  <script>
-   var id = "";
-   var type = "";
+<?php
+}
 
-   $(document).ready(function(){
-       checkTypeRadioStatus();
-       checkMetaCheckbox();
-
-       $('input[name="type"]').click(function() {
-           checkTypeRadioStatus();
-       });
-       $('#meta-checkbox').click(function() {
-           checkMetaCheckbox();
-       });
-
-       $('#url-base').change(function() {
-           checkMetaCheckbox();
-       });
-       $('#post-id').change(function() {
-           id = $('#post-id').val();
-           checkMetaCheckbox();
-       });
-       $('#page-id').change(function() {
-           id = $('#page-id').val();
-           checkMetaCheckbox();
-       });
-       $('#custom-id').change(function() {
-           id = $('#custom-id').val();
-           type = type + "/";
-           checkMetaCheckbox();
-       });
-       $('#custom-type').change(function() {
-           type = "posts?type[]=" + $('#custom-type').val();
-           checkMetaCheckbox();
-       });
-   });
-
-   function checkTypeRadioStatus() {
-       if ($('#post-radio-btn').is(':checked')) {
-           type = "posts/";
-           $('#post-id').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#post-id').css('display', 'none');
-       }
-       if ($('#page-radio-btn').is(':checked')) {
-           type = "pages/";
-           $('#page-id').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#page-id').css('display', 'none');
-       }
-       if ($('#custom-radio-btn').is(':checked')) {
-           type = "?type[]=";
-           $('#custom-id').css('display', 'inline');
-           $('#custom-type').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#custom-id').css('display', 'none');
-           $('#custom-type').css('display', 'none');
-       }
-   }
-
-   // changes the url, according to whether of not the meta checkbox is checked
-   function checkMetaCheckbox() {
-       if ($('#meta-checkbox').is(':checked')) {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + id + '/meta');
-       } else {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + id);
-       }
-   }
-  </script>
+function description() {
+?>
+  <div class="text-description">
+    <ul>
+      <li>Enter an url above. e.g. http://wonka.cac.washington.edu/itconnect/wp-json/posts</li>
+      <li>FYI:</li>
+      <ul>
+        <li>posts/id/meta</li>
+        <li>How you should get custom post type</li>
+        <ul>
+          <li>example: posts/id?type[]=service</li>
+          <li>example: posts/id/meta?type[]=service</li>
+        </ul>
+        <li>pages/id/meta</li>
+        <li>users/id/meta</li>
+      </ul>
+    </ul>
+  </div>
 <?php
 }
 
@@ -194,5 +209,4 @@ function put_json($str) {
   </div>
 <?php
 }
-
 ?>
