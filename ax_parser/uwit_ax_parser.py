@@ -3,6 +3,7 @@
 from xml.dom import minidom
 import argparse
 import matplotlib.pyplot as plt
+from colorama import Fore
 
 class Activity():
 
@@ -55,11 +56,11 @@ def printdata(projects, graph):
         labels.append(project)
         sizes.append(projects[project].totalhours)
         explode.append(0.025)
-        print "%s (%s)" % (project, str(projects[project].totalhours))
+        print(Fore.RED + "%s (%s)" % (project, str(projects[project].totalhours)) + Fore.RESET)
         for activity in projects[project].activities:
-            print "   - %s (%s)" % (activity, str(projects[project].activities[activity].totalhours))
+            print(Fore.CYAN + "   - %s (%s)" % (activity, str(projects[project].activities[activity].totalhours)) + Fore.RESET)
         print
-    print "Total number of hours on these timesheets: " + str(timeSheetHours)
+    print(Fore.RED + "Total number of hours on these timesheets: " + str(timeSheetHours) + Fore.RESET)
     print
     print "************************************************************************"
     if graph:
