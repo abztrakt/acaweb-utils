@@ -3,45 +3,58 @@
 from xml.dom import minidom
 import argparse
 
+class Activity():
 
-#TODO: make this take the timesheet file as an argument, not as a hard-coded var
-TIMESHEET = "/Users/cstimmel/Downloads/TSTimesheetSignOff.Report.xml"
-WEEK_HOURS = 40  # The number of hours that should be used to calculate each project as a percentage of the week's work.
+    def __init__(self, name, total):
+        self.totalhours = total
+        self.name = name
 
+class Project():
 
-class TimesheetDatum():
-    project = None
-    activity = None
-    totalhrs = 0
-
-    def __repr__(self):
-        return "%s (%s)" % (self.project, self.activity)
-
-    def percentage(self):
-        weekhours = WEEK_HOURS * args.timesheets.__len__()
-        return self.totalhrs/weekhours * 100
+    def __init__(self, name):
+        self.name = name
+        self.activities ={}
+        self.totalhours = 0
 
 def tsparse(timesheets):
-    data = {}
+    projects = {}
     for timesheet in timesheets:
         xmldoc = minidom.parse(timesheet)
         details = xmldoc.getElementsByTagName('Detail')
         for detail in details:
-            repr = "%s (%s)" % (detail.getAttribute('Textbox_59'), detail.getAttribute('ActivityTxt'))
+            project = detail.getAttribute('Textbox_59')
+            activityName = detail.getAttribute('ActivityTxt')
             try:
-                data[repr].totalhrs = data[repr].totalhrs + float(detail.getAttribute('TotalHours1'))
+                projects[project].totalhours = projects[project].totalhours + float(detail.getAttribute('TotalHours1'))
+                if activityName in projects[project].activities:
+                    projects[project].activities[activityName].totalhours = projects[project].activities[activityName].totalhours + float(detail.getAttribute('TotalHours1'))
+                else:
+                    activity = Activity(activityName, float(detail.getAttribute('TotalHours1')))
+                    projects[project].activities[activityName] = activity
             except KeyError:
-                obj = TimesheetDatum()
-                obj.project = detail.getAttribute('Textbox_59')
-                obj.activity = detail.getAttribute('ActivityTxt')
-                obj.totalhrs = float(detail.getAttribute('TotalHours1'))
-            data[obj.__repr__()] = obj
-    return data
+                obj = Project(project)
+                activity = Activity(activityName, float(detail.getAttribute('TotalHours1')))
+                obj.activities[activityName] = activity
+                obj.totalhours = float(detail.getAttribute('TotalHours1'))
+                projects[project] = obj
+                projects[project].activities[activityName] = activity
 
+    return projects
 
-def printdata(data):
-    for datum in data.values():
-        print "%s: %s%% (%s hrs)" % (datum.__repr__(), datum.percentage(), datum.totalhrs)
+def printdata(projects):
+    print "************************************************************************"
+    print
+    print
+    timeSheetHours = 0
+    for project in projects:
+        timeSheetHours = timeSheetHours + projects[project].totalhours
+        print "%s (%s)" % (project, str(projects[project].totalhours))
+        for activity in projects[project].activities:
+            print "   - %s (%s)" % (activity, str(projects[project].activities[activity].totalhours))
+        print
+    print "Total number of hours on these timesheets: " + str(timeSheetHours)
+    print
+    print "************************************************************************"
 
 def main(args):
     data = tsparse(args.timesheets)
