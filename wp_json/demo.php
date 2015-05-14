@@ -77,6 +77,7 @@ if (is_null($username)) {
     echo "<p>Welcome to WP API demo. Remember to put <b>'http://' or 'https://'</b> in front of your URL.</p>";
     
     get_form(); // show the form
+    description();
 
     // Using apache authorization information
     $args = array(
@@ -98,143 +99,36 @@ if (is_null($username)) {
 
         // unset because we are done
         unset($_POST['submit_input']);
-    } else {
-        echo "SDFIOSDFSDFSD";
     }
 }
 
 function get_form() {
 ?>
   <form name="input_form" id="input-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
-    <input type="text" placeholder="Your base url. E.g. http://wonka.cac.washington.edu/itconnect/wp-json" name="url_base" id="url-base" size="80"><br>
-    
-    <!--input type="text" placeholder="Enter a url here" name="url_input" id="url-input" size="100"-->
-    <div class="radio-area">
-      <input type="radio" name="request_method" value="GET" id="get-method-radio-btn" checked>GET  (to retrieve something)<br>
-    </div>
-    <div class="radio-area">
-      <input type="radio" name="type" value="post" id="post-radio-btn" checked>post<input type="text" placeholder="post id" name="post_id" style="display:none" id="post-id" size="20"><br>
-      <input type="radio" name="type" value="page" id="page-radio-btn">page<input type="text" placeholder="page id" name="page_id" style="display:none" id="page-id" size="20"><br>
-      <input type="radio" name="type" value="custom" id="custom-radio-btn">custom post type<input type="text" placeholder="custom type id" name="custom_id" style="display:none" id="custom-id" size="20"><input type="text" placeholder="custom post type" name="custom_type" style="display:none" id="custom-type" size="40"><br>
-      <input type="radio" name="type" value="user" id="user-radio-btn">user<input type="text" placeholder="user id" name="user_id" style="display:none" id="user-id" size="20"><br>
-    </div>
-    <br>
-    <input type="checkbox" name="meta" id="meta-checkbox"><i>meta</i>
-    <p id="url-to-request">You are about to <u id="request-method-prompt"></u><input type="hidden" name="method" id="request-method-hidden"></u> <input type="text" name="url_request" value="" size="100" id="real-url"></p>
+    <p id="url-to-request">You are about to <u>GET</u><input type="hidden" name="method" id="request-method-hidden"></u> <input type="text" name="url_request" value="" size="100" id="real-url"></p>
     <input type="submit" value="Submit" id="submit-input" name="submit_input" class="submit-btn">
   </form>
-  <script>
-   var id = "";
-   var type = "";
-   var data = "";
+<?php
+}
 
-   $(document).ready(function(){
-       checkTypeRadioStatus();
-       checkMetaCheckbox();
-       getRequestMethod();
-
-       $('input[name="request_method"]').click(function() {
-           getRequestMethod();
-       });
-       $('input[name="type"]').click(function() {
-           checkTypeRadioStatus();
-       });
-       $('#meta-checkbox').click(function() {
-           checkMetaCheckbox();
-       });
-       
-       // text fields
-       $('#url-base').change(function() {
-           checkMetaCheckbox();
-       });
-       $('#post-id').change(function() {
-           id = $('#post-id').val();
-           checkMetaCheckbox();
-       });
-       $('#page-id').change(function() {
-           id = $('#page-id').val();
-           checkMetaCheckbox();
-       });
-       $('#custom-id').change(function() {
-           id = $('#custom-id').val();
-           checkMetaCheckbox();
-       });
-       $('#custom-type').change(function() {
-           type = "posts?type[]=" + $('#custom-type').val();
-           checkMetaCheckbox();
-       });
-       $('#user-id').change(function() {
-           id = $('#user-id').val();
-           checkMetaCheckbox();
-       });
-   });
-
-   function checkTypeRadioStatus() {
-       if ($('#post-radio-btn').is(':checked')) {
-           type = "posts";
-           $('#post-id').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#post-id').css('display', 'none');
-       }
-       if ($('#page-radio-btn').is(':checked')) {
-           type = "pages";
-           $('#page-id').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#page-id').css('display', 'none');
-       }
-       if ($('#custom-radio-btn').is(':checked')) {
-           type = "?type[]=";
-           $('#custom-id').css('display', 'inline');
-           $('#custom-type').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#custom-id').css('display', 'none');
-           $('#custom-type').css('display', 'none');
-       }
-       if ($('#user-radio-btn').is(':checked')) {
-           type = "users";
-           $('#user-id').css('display', 'inline');
-           checkMetaCheckbox();
-       } else {
-           $('#user-id').css('display', 'none');
-       }
-   }
-
-   // changes the url, according to whether of not the meta checkbox is checked
-   function checkMetaCheckbox() {
-       if ($('#meta-checkbox').is(':checked')) {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id + '/meta');
-       } else {
-           $('#url-to-request input').val($('#url-base').val() + "/" + type + "/" + id);
-       }
-   }
-
-   function getRequestMethod() {
-       $('#request-method-prompt').html('GET');
-       $('#request-method-hiddem').val('get');
-       $('#post-method-data').css('display', 'none');
-       /* if ($('#post-method-radio-btn').is(':checked')) {
-           $('#input-form').attr('method', 'post');
-           $('#request-method-prompt').html('POST');
-           $('#request-method-hiddem').val('post');
-           $('#post-method-data').css('display', 'inline');
-       } else if ($('#get-method-radio-btn').is(':checked')) {
-  
-       } else if ($('#put-method-radio-btn').is(':checked')) {
-           $('#input-form').attr('method', 'put');
-           $('#request-method-prompt').html('PUT')
-           $('#request-method-hiddem').val('put');
-           $('#post-method-data').css('display', 'none');
-       } else {
-           $('#input-form').attr('method', 'delete');
-           $('#request-method-prompt').html('DELETE');
-           $('#request-method-hiddem').val('delete');
-           $('#post-method-data').css('display', 'none');
-       }*/
-   }
-  </script>
+function description() {
+?>
+  <div class="text-description">
+    <ul>
+      <li>Enter an url above. e.g. http://wonka.cac.washington.edu/itconnect/wp-json/posts</li>
+      <li>FYI:</li>
+      <ul>
+        <li>posts/id/meta</li>
+        <li>How you should get custom post type</li>
+        <ul>
+          <li>example: posts/id?type[]=service</li>
+          <li>example: posts/id/meta?type[]=service</li>
+        </ul>
+        <li>pages/id/meta</li>
+        <li>users/id/meta</li>
+      </ul>
+    </ul>
+  </div>
 <?php
 }
 
