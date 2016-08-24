@@ -41,3 +41,7 @@ nosetests.xml
 
 # Drush site_vars to ignore
 git_drush_managment/*vars
+
+# other stuff to ignore
+*/settings.py
+venv
