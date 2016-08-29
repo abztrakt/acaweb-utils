@@ -12,6 +12,10 @@ def get_spot(spot_id):
     auth = OAuth1(settings.KEY, settings.SECRET)
     url = "{0}/api/v1/spot/{1}".format(settings.URL, spot_id)
     response = requests.get(url, auth=auth)
+    data = json.loads(response.content)
+    print data
+    etag = data['etag']
+    print "GET etag: {0}".format(etag)
     return response
 
 
@@ -19,19 +23,24 @@ def post_to_spot(spot_id, response):
     auth = OAuth1(settings.KEY, settings.SECRET)
     url = "{0}/api/v1/spot/{1}".format(settings.URL, spot_id)
     data =  json.loads(response.content)
-    etag = data['etag']
-    print "GET etag: {0}".format(etag)
+    old_etag = data['etag']
     rand = random.randrange(0,9999)
     data["extended_info"]["random_int"] = rand
     data = json.dumps(data)
-    print data
     headers = {'X-OAuth-User': settings.USER,
-               'If-Match': etag,
+               'If-Match': old_etag,
                'Content-Type': 'application/json',
                'Accept': 'application/json'}
     response2 = requests.put(url, auth=auth, data=data, headers=headers)
-    print response2
-    print response2.content
+    new_data = json.loads(response2.content)
+    try:
+        new_etag = new_data['etag']
+        print "PUT etag {0}".format(new_etag)
+        print response2
+    except:
+        print response2.content
+        print response2
+
 
 
 def main():
