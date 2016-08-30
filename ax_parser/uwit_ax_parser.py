@@ -2,7 +2,10 @@
 """
 from xml.dom import minidom
 import argparse
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except:
+    pass
 from colorama import Fore
 
 class Activity():
