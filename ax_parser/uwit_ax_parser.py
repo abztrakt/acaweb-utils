@@ -2,8 +2,11 @@
 """
 from xml.dom import minidom
 import argparse
-import matplotlib.pyplot as plt
 from colorama import Fore
+try:
+    import matplotlib.pyplot as plt
+except:
+    pass
 
 class Activity():
 
